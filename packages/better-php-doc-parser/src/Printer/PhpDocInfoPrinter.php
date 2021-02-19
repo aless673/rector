@@ -204,7 +204,7 @@ final class PhpDocInfoPrinter
         if (! Strings::match($output, self::OPENING_DOCBLOCK_REGEX)) {
             return $output;
         }
-        if (! $output) {
+        if ($output === '') {
             return $output;
         }
         if (Strings::match($output, self::CLOSING_DOCBLOCK_REGEX)) {
