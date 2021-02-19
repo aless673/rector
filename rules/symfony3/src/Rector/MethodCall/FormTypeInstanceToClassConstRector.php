@@ -145,7 +145,7 @@ CODE_SAMPLE
                 $argValue->args
             );
 
-            if (! $methodCall instanceof \PhpParser\Node\Expr\MethodCall) {
+            if (! $methodCall instanceof MethodCall) {
                 return null;
             }
         }

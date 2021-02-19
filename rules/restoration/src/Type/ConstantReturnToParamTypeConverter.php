@@ -6,6 +6,7 @@ namespace Rector\Restoration\Type;
 
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantStringType;
+use PHPStan\Type\Generic\GenericClassStringType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
@@ -37,20 +38,34 @@ final class ConstantReturnToParamTypeConverter
         if ($type instanceof ConstantArrayType) {
             return $this->unwrapConstantTypeToObjectType($type->getItemType());
         }
+
         if ($type instanceof ConstantStringType) {
             return new ObjectType($type->getValue());
         }
-        if ($type instanceof UnionType) {
-            $types = [];
-            foreach ($type->getTypes() as $unionedType) {
-                $type = $this->unwrapConstantTypeToObjectType($unionedType);
-                if ($type !== null) {
-                    $types[] = $type;
-                }
+
+        if ($type instanceof GenericClassStringType) {
+            if ($type->getGenericType() instanceof ObjectType) {
+                return $type->getGenericType();
             }
-            return $this->typeFactory->createMixedPassedOrUnionType($types);
+        }
+
+        if ($type instanceof UnionType) {
+            return $this->unwrapUnionType($type);
         }
 
         return null;
+    }
+
+    private function unwrapUnionType(UnionType $unionType): Type
+    {
+        $types = [];
+        foreach ($unionType->getTypes() as $unionedType) {
+            $unionType = $this->unwrapConstantTypeToObjectType($unionedType);
+            if ($unionType !== null) {
+                $types[] = $unionType;
+            }
+        }
+
+        return $this->typeFactory->createMixedPassedOrUnionType($types);
     }
 }
