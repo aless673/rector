@@ -69,16 +69,14 @@ final class CakePHPFullyQualifiedClassNameResolver
         if (interface_exists($cakePhpVersion)) {
             return $cakePhpVersion;
         }
-
         // C. is not plugin nor lib custom App class?
-        if (Strings::contains($pseudoNamespace, '\\') && ! Strings::match(
-            $pseudoNamespace,
-            self::PLUGIN_OR_LIB_REGEX
-        )) {
-            return 'App\\' . $pseudoNamespace . '\\' . $shortClass;
+        if (! Strings::contains($pseudoNamespace, '\\')) {
+            return $pseudoNamespace . '\\' . $shortClass;
         }
-
-        return $pseudoNamespace . '\\' . $shortClass;
+        if (Strings::match($pseudoNamespace, self::PLUGIN_OR_LIB_REGEX)) {
+            return $pseudoNamespace . '\\' . $shortClass;
+        }
+        return 'App\\' . $pseudoNamespace . '\\' . $shortClass;
     }
 
     private function normalizeFileSystemSlashes(string $pseudoNamespace): string

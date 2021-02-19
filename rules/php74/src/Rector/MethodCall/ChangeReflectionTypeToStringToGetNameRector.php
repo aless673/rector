@@ -99,10 +99,13 @@ CODE_SAMPLE
             if ($node->expr instanceof MethodCall) {
                 return $this->refactorIfHasReturnTypeWasCalled($node->expr);
             }
-
-            if ($node->expr instanceof Variable && $this->isObjectType($node->expr, 'ReflectionType')) {
-                return $this->nodeFactory->createMethodCall($node->expr, self::GET_NAME);
+            if (! $node->expr instanceof Variable) {
+                return;
             }
+            if (! $this->isObjectType($node->expr, 'ReflectionType')) {
+                return;
+            }
+            return $this->nodeFactory->createMethodCall($node->expr, self::GET_NAME);
         }
 
         return null;

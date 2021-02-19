@@ -60,10 +60,12 @@ abstract class AbstractPregToNetteUtilsStringsRector extends AbstractRector impl
      */
     protected function createBoolCast(?Node $node, Node $expr): Bool_
     {
-        if ($node instanceof Return_ && $expr instanceof Assign) {
-            $expr = $expr->expr;
+        if (! $node instanceof Return_) {
+            return new Bool_($expr);
         }
-
-        return new Bool_($expr);
+        if (! $expr instanceof Assign) {
+            return new Bool_($expr);
+        }
+        $expr = $expr->expr;
     }
 }

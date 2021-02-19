@@ -96,12 +96,13 @@ final class NonFluentChainMethodCallFactory
         );
 
         $nodesToAdd = array_merge($nodesToAdd, $decoupledMethodCalls);
-
-        if ($assignAndRootExpr->getSilentVariable() !== null && $kind !== FluentCallsKind::IN_ARGS) {
-            $nodesToAdd[] = $assignAndRootExpr->getReturnSilentVariable();
+        if ($assignAndRootExpr->getSilentVariable() === null) {
+            return $nodesToAdd;
         }
-
-        return $nodesToAdd;
+        if ($kind === FluentCallsKind::IN_ARGS) {
+            return $nodesToAdd;
+        }
+        $nodesToAdd[] = $assignAndRootExpr->getReturnSilentVariable();
     }
 
     private function createAssignExpression(Variable $newVariable, New_ $new): Expression
@@ -145,14 +146,15 @@ final class NonFluentChainMethodCallFactory
             $chainMethodCall->var = $this->firstMethodCallVarResolver->resolve($assignAndRootExpr, $key);
             $decoupledMethodCalls[] = $chainMethodCall;
         }
-
-        if ($assignAndRootExpr->getRootExpr() instanceof New_ && $assignAndRootExpr->getSilentVariable() !== null) {
-            $decoupledMethodCalls[] = new Assign(
-                $assignAndRootExpr->getSilentVariable(),
-                $assignAndRootExpr->getRootExpr()
-            );
+        if (! $assignAndRootExpr->getRootExpr() instanceof New_) {
+            return array_reverse($decoupledMethodCalls);
         }
-
-        return array_reverse($decoupledMethodCalls);
+        if ($assignAndRootExpr->getSilentVariable() === null) {
+            return array_reverse($decoupledMethodCalls);
+        }
+        $decoupledMethodCalls[] = new Assign(
+            $assignAndRootExpr->getSilentVariable(),
+            $assignAndRootExpr->getRootExpr()
+        );
     }
 }

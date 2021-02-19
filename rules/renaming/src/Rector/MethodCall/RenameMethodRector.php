@@ -109,12 +109,14 @@ CODE_SAMPLE
             }
 
             $node->name = new Identifier($methodCallRename->getNewMethod());
-
-            if ($methodCallRename instanceof MethodCallRenameWithArrayKey && ! $node instanceof ClassMethod) {
-                return new ArrayDimFetch($node, BuilderHelpers::normalizeValue($methodCallRename->getArrayKey()));
+            if (! $methodCallRename instanceof MethodCallRenameWithArrayKey) {
+                return $node;
             }
-
-            return $node;
+            if ($node instanceof ClassMethod) {
+                return $node;
+            }
+            return new ArrayDimFetch($node, BuilderHelpers::normalizeValue($methodCallRename->getArrayKey()));
+            return;
         }
 
         return null;

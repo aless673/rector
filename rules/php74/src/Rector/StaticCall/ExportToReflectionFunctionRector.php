@@ -63,11 +63,12 @@ CODE_SAMPLE
         }
 
         $new = new New_($node->class, [new Arg($node->args[0]->value)]);
-
-        if (isset($node->args[1]) && $this->valueResolver->isTrue($node->args[1]->value)) {
-            return new String_($new);
+        if (! isset($node->args[1])) {
+            return $new;
         }
-
-        return $new;
+        if (! $this->valueResolver->isTrue($node->args[1]->value)) {
+            return $new;
+        }
+        return new String_($new);
     }
 }

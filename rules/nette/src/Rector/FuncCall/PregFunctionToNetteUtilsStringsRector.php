@@ -90,9 +90,13 @@ CODE_SAMPLE
 
         if ($identical->right instanceof FuncCall) {
             $refactoredFuncCall = $this->refactorFuncCall($identical->right);
-            if ($refactoredFuncCall !== null && $this->valueResolver->isValue($identical->left, 1)) {
-                return new Bool_($refactoredFuncCall);
+            if ($refactoredFuncCall === null) {
+                return;
             }
+            if (! $this->valueResolver->isValue($identical->left, 1)) {
+                return;
+            }
+            return new Bool_($refactoredFuncCall);
         }
 
         return null;
@@ -126,13 +130,14 @@ CODE_SAMPLE
         }
 
         $currentFunctionName = $this->getName($funcCall);
-
         // assign
-        if (isset($funcCall->args[2]) && $currentFunctionName !== 'preg_replace') {
-            return new Assign($funcCall->args[2]->value, $matchStaticCall);
+        if (! isset($funcCall->args[2])) {
+            return $matchStaticCall;
         }
-
-        return $matchStaticCall;
+        if ($currentFunctionName === 'preg_replace') {
+            return $matchStaticCall;
+        }
+        return new Assign($funcCall->args[2]->value, $matchStaticCall);
     }
 
     private function createMatchStaticCall(FuncCall $funcCall, string $methodName): StaticCall

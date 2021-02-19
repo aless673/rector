@@ -76,11 +76,14 @@ final class JsonArrayFactory
                 }
 
                 $placeholderNode = $this->matchPlaceholderNode($onlyItem->value, $placeholderNodes);
-
-                if ($placeholderNode && $this->implodeAnalyzer->isImplodeToJson($placeholderNode)) {
-                    /** @var FuncCall $placeholderNode */
-                    return $placeholderNode->args[1]->value;
+                if (! $placeholderNode) {
+                    return;
                 }
+                if (! $this->implodeAnalyzer->isImplodeToJson($placeholderNode)) {
+                    return;
+                }
+                /** @var FuncCall $placeholderNode */
+                return $placeholderNode->args[1]->value;
             }
 
             return $this->matchPlaceholderNode($node, $placeholderNodes);

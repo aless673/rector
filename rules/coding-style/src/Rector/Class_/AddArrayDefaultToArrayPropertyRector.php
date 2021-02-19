@@ -229,15 +229,13 @@ CODE_SAMPLE
             ) && $this->valueResolver->isNull($node->right)) {
                 $node->right = new Array_();
             }
-
-            if ($this->propertyFetchAnalyzer->isLocalPropertyOfNames(
-                $node->right,
-                $propertyNames
-            ) && $this->valueResolver->isNull($node->left)) {
-                $node->left = new Array_();
+            if (! $this->propertyFetchAnalyzer->isLocalPropertyOfNames($node->right, $propertyNames)) {
+                return $node;
             }
-
-            return $node;
+            if (! $this->valueResolver->isNull($node->left)) {
+                return $node;
+            }
+            $node->left = new Array_();
         });
     }
 

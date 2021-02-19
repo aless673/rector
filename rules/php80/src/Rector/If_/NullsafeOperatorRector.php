@@ -182,14 +182,19 @@ CODE_SAMPLE
 
     private function processAssign(Assign $assign, Expression $prevExpression, Node $nextNode, bool $isStartIf): ?Node
     {
-        if ($assign instanceof Assign && property_exists(
-            $assign->expr,
-            self::NAME
-        ) && property_exists($nextNode, 'expr') && property_exists($nextNode->expr, self::NAME)) {
-            return $this->processAssignInCurrentNode($assign, $prevExpression, $nextNode, $isStartIf);
+        if (! $assign instanceof Assign) {
+            return $this->processAssignMayInNextNode($nextNode);
         }
-
-        return $this->processAssignMayInNextNode($nextNode);
+        if (! property_exists($assign->expr, self::NAME)) {
+            return $this->processAssignMayInNextNode($nextNode);
+        }
+        if (! property_exists($nextNode, 'expr')) {
+            return $this->processAssignMayInNextNode($nextNode);
+        }
+        if (! property_exists($nextNode->expr, self::NAME)) {
+            return $this->processAssignMayInNextNode($nextNode);
+        }
+        return $this->processAssignInCurrentNode($assign, $prevExpression, $nextNode, $isStartIf);
     }
 
     private function processIfMayInNextNode(?Node $nextNode = null): ?Node

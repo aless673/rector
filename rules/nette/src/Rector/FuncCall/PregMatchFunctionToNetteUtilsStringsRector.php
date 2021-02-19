@@ -82,9 +82,13 @@ CODE_SAMPLE
 
         if ($identical->right instanceof FuncCall) {
             $refactoredFuncCall = $this->refactorFuncCall($identical->right);
-            if ($refactoredFuncCall !== null && $this->valueResolver->isValue($identical->left, 1)) {
-                return $this->createBoolCast($parentNode, $refactoredFuncCall);
+            if ($refactoredFuncCall === null) {
+                return;
             }
+            if (! $this->valueResolver->isValue($identical->left, 1)) {
+                return;
+            }
+            return $this->createBoolCast($parentNode, $refactoredFuncCall);
         }
 
         return null;

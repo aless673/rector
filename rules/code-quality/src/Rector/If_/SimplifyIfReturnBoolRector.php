@@ -135,24 +135,28 @@ CODE_SAMPLE
         if ($nextNode->expr === null) {
             return true;
         }
-
         // negate + negate → skip for now
-        if ($this->valueResolver->isFalse($returnedExpr) && Strings::contains($this->print($if->cond), '!=')) {
-            return true;
+        if (! $this->valueResolver->isFalse($returnedExpr)) {
+            return ! $this->valueResolver->isTrueOrFalse($nextNode->expr);
         }
-
-        return ! $this->valueResolver->isTrueOrFalse($nextNode->expr);
+        if (! Strings::contains($this->print($if->cond), '!=')) {
+            return ! $this->valueResolver->isTrueOrFalse($nextNode->expr);
+        }
+        return true;
     }
 
     private function processReturnTrue(If_ $if, Return_ $nextReturnNode): Return_
     {
-        if ($if->cond instanceof BooleanNot && $nextReturnNode->expr !== null && $this->valueResolver->isTrue(
-            $nextReturnNode->expr
-        )) {
-            return new Return_($this->exprBoolCaster->boolCastOrNullCompareIfNeeded($if->cond->expr));
+        if (! $if->cond instanceof BooleanNot) {
+            return new Return_($this->exprBoolCaster->boolCastOrNullCompareIfNeeded($if->cond));
         }
-
-        return new Return_($this->exprBoolCaster->boolCastOrNullCompareIfNeeded($if->cond));
+        if ($nextReturnNode->expr === null) {
+            return new Return_($this->exprBoolCaster->boolCastOrNullCompareIfNeeded($if->cond));
+        }
+        if (! $this->valueResolver->isTrue($nextReturnNode->expr)) {
+            return new Return_($this->exprBoolCaster->boolCastOrNullCompareIfNeeded($if->cond));
+        }
+        return new Return_($this->exprBoolCaster->boolCastOrNullCompareIfNeeded($if->cond->expr));
     }
 
     private function processReturnFalse(If_ $if, Return_ $nextReturnNode): ?Return_

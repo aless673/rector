@@ -95,13 +95,12 @@ CODE_SAMPLE
         if ($firstArgumentValue instanceof String_) {
             return null;
         }
-
-        if (count($node->args) === 2 && $this->stringTypeAnalyzer->isStringOrUnionStringOnlyType(
-            $node->args[1]->value
-        )) {
-            $node->args = array_reverse($node->args);
+        if (count($node->args) !== 2) {
+            return $node;
         }
-
-        return $node;
+        if (! $this->stringTypeAnalyzer->isStringOrUnionStringOnlyType($node->args[1]->value)) {
+            return $node;
+        }
+        $node->args = array_reverse($node->args);
     }
 }

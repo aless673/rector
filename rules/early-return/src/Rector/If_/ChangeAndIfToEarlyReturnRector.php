@@ -145,12 +145,13 @@ CODE_SAMPLE
         if (! $isInLoop) {
             return $this->processReplaceIfs($node, $conditions, $ifNextReturnClone);
         }
-
-        if (property_exists($ifNextReturn, 'expr') && $ifNextReturn->expr instanceof Expr) {
-            $this->addNodeAfterNode(new Return_(), $node);
+        if (! property_exists($ifNextReturn, 'expr')) {
+            return $this->processReplaceIfs($node, $conditions, $ifNextReturnClone);
         }
-
-        return $this->processReplaceIfs($node, $conditions, $ifNextReturnClone);
+        if (! $ifNextReturn->expr instanceof Expr) {
+            return $this->processReplaceIfs($node, $conditions, $ifNextReturnClone);
+        }
+        $this->addNodeAfterNode(new Return_(), $node);
     }
 
     /**
@@ -238,7 +239,7 @@ CODE_SAMPLE
         foreach ($conditions as $condition) {
             $invertedCondition = $this->conditionInverter->createInvertedCondition($condition);
             $if = new If_($invertedCondition);
-            $if->stmts = [$isInLoop && $getIfNextReturn === null ? new Continue_() : $return];
+            $if->stmts = [$isInLoop && ! $getIfNextReturn instanceof Return_ ? new Continue_() : $return];
 
             $ifs[] = $if;
         }

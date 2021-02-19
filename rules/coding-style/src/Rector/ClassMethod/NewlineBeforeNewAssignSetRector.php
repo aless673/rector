@@ -115,10 +115,13 @@ CODE_SAMPLE
             if ($this->shouldSkipLeftVariable($stmt)) {
                 return null;
             }
-
-            if (! $stmt->var instanceof MethodCall && ! $stmt->var instanceof StaticCall) {
-                return $this->getName($stmt->var);
+            if ($stmt->var instanceof MethodCall) {
+                return;
             }
+            if ($stmt->var instanceof StaticCall) {
+                return;
+            }
+            return $this->getName($stmt->var);
         }
 
         return null;

@@ -134,9 +134,13 @@ final class NameImporter
         $importShortClasses = $this->parameterProvider->provideParameter(Option::IMPORT_SHORT_CLASSES);
         if (! $importShortClasses) {
             $name = $this->nodeNameResolver->getName($name);
-            if ($name !== null && substr_count($name, '\\') === 0) {
-                return true;
+            if ($name === null) {
+                return;
             }
+            if (substr_count($name, '\\') !== 0) {
+                return;
+            }
+            return true;
         }
 
         return false;
@@ -201,12 +205,13 @@ final class NameImporter
         ) && function_exists($fullName)) {
             return true;
         }
-
-        if (! $parentNode instanceof ConstFetch && ! $parentNode instanceof FuncCall) {
-            return false;
+        if ($parentNode instanceof ConstFetch) {
+            return count($name->parts) === 1;
         }
-
-        return count($name->parts) === 1;
+        if ($parentNode instanceof FuncCall) {
+            return count($name->parts) === 1;
+        }
+        return false;
     }
 
     private function isNonExistingClassLikeAndFunctionFullyQualifiedName(Name $name): bool

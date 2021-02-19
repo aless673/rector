@@ -74,12 +74,13 @@ final class AnonymousFunctionFactory
         } else {
             $anonymousFunction->stmts[] = new Expression($innerMethodCall);
         }
-
-        if ($node instanceof Variable && ! $this->nodeNameResolver->isName($node, 'this')) {
-            $anonymousFunction->uses[] = new ClosureUse($node);
+        if (! $node instanceof Variable) {
+            return $anonymousFunction;
         }
-
-        return $anonymousFunction;
+        if ($this->nodeNameResolver->isName($node, 'this')) {
+            return $anonymousFunction;
+        }
+        $anonymousFunction->uses[] = new ClosureUse($node);
     }
 
     /**

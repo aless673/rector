@@ -75,7 +75,6 @@ CODE_SAMPLE
         }
 
         $node->value = (string) $node->value;
-
         /**
          * This code follows a guess, to avoid modifying floats needlessly.
          * If the node is a float, but it doesn't contain ".",
@@ -83,10 +82,13 @@ CODE_SAMPLE
          * by adding ".0" at the end (eg: 0.0).
          * Then, add it again.
          */
-        if ($node instanceof DNumber && ! Strings::contains($node->value, '.')) {
-            $node->value .= '.0';
+        if (! $node instanceof DNumber) {
+            return $node;
         }
-        return $node;
+        if (Strings::contains($node->value, '.')) {
+            return $node;
+        }
+        $node->value .= '.0';
     }
 
     /**

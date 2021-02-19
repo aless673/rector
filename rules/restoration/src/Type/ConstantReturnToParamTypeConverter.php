@@ -25,11 +25,13 @@ final class ConstantReturnToParamTypeConverter
 
     public function convert(Type $type): ?Type
     {
-        if (! $type instanceof ConstantStringType && ! $type instanceof ConstantArrayType) {
-            return null;
+        if ($type instanceof ConstantStringType) {
+            return $this->unwrapConstantTypeToObjectType($type);
         }
-
-        return $this->unwrapConstantTypeToObjectType($type);
+        if ($type instanceof ConstantArrayType) {
+            return $this->unwrapConstantTypeToObjectType($type);
+        }
+        return null;
     }
 
     private function unwrapConstantTypeToObjectType(Type $type): ?Type
