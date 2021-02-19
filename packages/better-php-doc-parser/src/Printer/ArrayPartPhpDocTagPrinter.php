@@ -43,12 +43,13 @@ final class ArrayPartPhpDocTagPrinter
         if ($this->isValueWithoutQuotes($key, $tagValueNodeConfiguration)) {
             $content = Strings::replace($content, '#"#', '');
         }
-
-        if ($tagValueNodeConfiguration->getOriginalContent() !== null && $key !== null) {
-            $content = $this->quoteKeys($item, $key, $content, $tagValueNodeConfiguration->getOriginalContent());
+        if ($tagValueNodeConfiguration->getOriginalContent() === null) {
+            return $keyPart . $content;
         }
-
-        return $keyPart . $content;
+        if ($key === null) {
+            return $keyPart . $content;
+        }
+        $content = $this->quoteKeys($item, $key, $content, $tagValueNodeConfiguration->getOriginalContent());
     }
 
     /**

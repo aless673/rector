@@ -67,14 +67,15 @@ final class TemplateFileSystem
         if ($this->isNonFixtureFileWithIncSuffix($destination)) {
             $destination = Strings::before($destination, '.inc');
         }
-
         // special hack for tests, to PHPUnit doesn't load the generated file as test case
         /** @var string $destination */
-        if (Strings::endsWith($destination, 'Test.php') && StaticPHPUnitEnvironment::isPHPUnitRun()) {
-            $destination .= '.inc';
+        if (! Strings::endsWith($destination, 'Test.php')) {
+            return $targetDirectory . DIRECTORY_SEPARATOR . $destination;
         }
-
-        return $targetDirectory . DIRECTORY_SEPARATOR . $destination;
+        if (! StaticPHPUnitEnvironment::isPHPUnitRun()) {
+            return $targetDirectory . DIRECTORY_SEPARATOR . $destination;
+        }
+        $destination .= '.inc';
     }
 
     private function isNonFixtureFileWithIncSuffix(string $filePath): bool

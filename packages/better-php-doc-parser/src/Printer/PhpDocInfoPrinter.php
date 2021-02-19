@@ -200,16 +200,17 @@ final class PhpDocInfoPrinter
         if (! Strings::match($output, self::DOCBLOCK_START_REGEX) && $output) {
             $output = '/**' . $output;
         }
-
         // fix missing end
-        if (Strings::match($output, self::OPENING_DOCBLOCK_REGEX) && $output && ! Strings::match(
-            $output,
-            self::CLOSING_DOCBLOCK_REGEX
-        )) {
-            $output .= ' */';
+        if (! Strings::match($output, self::OPENING_DOCBLOCK_REGEX)) {
+            return $output;
         }
-
-        return $output;
+        if (! $output) {
+            return $output;
+        }
+        if (Strings::match($output, self::CLOSING_DOCBLOCK_REGEX)) {
+            return $output;
+        }
+        $output .= ' */';
     }
 
     private function removeExtraSpacesAfterAsterisk(string $phpDocString): string
@@ -289,16 +290,17 @@ final class PhpDocInfoPrinter
         if (isset($this->tokens[$from - 1]) && $this->tokens[$from - 1][1] === Lexer::TOKEN_HORIZONTAL_WS) {
             --$from;
         }
-
         // skip extra empty lines above if this is the last one
-        if ($shouldSkipEmptyLinesAbove &&
-            Strings::contains($this->tokens[$from][0], PHP_EOL) &&
-            Strings::contains($this->tokens[$from + 1][0], PHP_EOL)
-        ) {
-            ++$from;
+        if (! $shouldSkipEmptyLinesAbove) {
+            return $this->appendToOutput($output, $from, $to, $positionJumpSet);
         }
-
-        return $this->appendToOutput($output, $from, $to, $positionJumpSet);
+        if (! Strings::contains($this->tokens[$from][0], PHP_EOL)) {
+            return $this->appendToOutput($output, $from, $to, $positionJumpSet);
+        }
+        if (! Strings::contains($this->tokens[$from + 1][0], PHP_EOL)) {
+            return $this->appendToOutput($output, $from, $to, $positionJumpSet);
+        }
+        ++$from;
     }
 
     /**

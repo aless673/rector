@@ -125,11 +125,12 @@ final class MultilineSpaceFormatPreserver
         if ($attributeAwareNode instanceof PhpDocTextNode) {
             $attributeAwareNode->text = $newText;
         }
-
-        if ($attributeAwareNode instanceof AttributeAwarePhpDocTagNode && $attributeAwareNode->value instanceof AttributeAwareGenericTagValueNode) {
-            $attributeAwareNode->value->value = $newText;
+        if (! $attributeAwareNode instanceof AttributeAwarePhpDocTagNode) {
+            return $attributeAwareNode;
         }
-
-        return $attributeAwareNode;
+        if (! $attributeAwareNode->value instanceof AttributeAwareGenericTagValueNode) {
+            return $attributeAwareNode;
+        }
+        $attributeAwareNode->value->value = $newText;
     }
 }

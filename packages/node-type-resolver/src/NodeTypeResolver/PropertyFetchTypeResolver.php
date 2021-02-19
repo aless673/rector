@@ -173,11 +173,13 @@ final class PropertyFetchTypeResolver implements NodeTypeResolverInterface
         }
 
         $phpDocInfo = $propertyFetch->getAttribute(AttributeKey::PHP_DOC_INFO);
-        if (! $phpDocInfo instanceof PhpDocInfo && $varObjectType instanceof ObjectType) {
-            return $this->getPropertyPropertyResolution($varObjectType, $propertyName);
+        if ($phpDocInfo instanceof PhpDocInfo) {
+            return $this->getTypeFromPhpDocInfo($phpDocInfo);
         }
-
-        return $this->getTypeFromPhpDocInfo($phpDocInfo);
+        if (! $varObjectType instanceof ObjectType) {
+            return $this->getTypeFromPhpDocInfo($phpDocInfo);
+        }
+        return $this->getPropertyPropertyResolution($varObjectType, $propertyName);
     }
 
     private function getPropertyPropertyResolution(ObjectType $varObjectType, string $propertyName): Type
