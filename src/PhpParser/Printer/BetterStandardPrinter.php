@@ -113,13 +113,14 @@ final class BetterStandardPrinter extends Standard
         $this->tabOrSpaceIndentCharacter = $this->indentCharacterDetector->detect($newStmts);
 
         $content = parent::printFormatPreserving($newStmts, $origStmts, $origTokens);
-
         // add new line in case of added stmts
-        if (count($stmts) !== count($origStmts) && ! (bool) Strings::match($content, self::NEWLINE_END_REGEX)) {
-            $content .= $this->nl;
+        if (count($stmts) === count($origStmts)) {
+            return $content;
         }
-
-        return $content;
+        if ((bool) Strings::match($content, self::NEWLINE_END_REGEX)) {
+            return $content;
+        }
+        $content .= $this->nl;
     }
 
     /**
@@ -431,11 +432,13 @@ final class BetterStandardPrinter extends Standard
      */
     private function resolveNewStmts(array $stmts): array
     {
-        if (count($stmts) === 1 && $stmts[0] instanceof FileWithoutNamespace) {
-            return $stmts[0]->stmts;
+        if (count($stmts) !== 1) {
+            return $stmts;
         }
-
-        return $stmts;
+        if (! $stmts[0] instanceof FileWithoutNamespace) {
+            return $stmts;
+        }
+        return $stmts[0]->stmts;
     }
 
     /**

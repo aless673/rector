@@ -51,11 +51,15 @@ final class NodesWithFileDestinationPrinter
     {
         $tokens = $this->lexer->getTokens();
         $lastToken = array_pop($tokens);
-
-        if ($lastToken && isset($lastToken[1]) && Strings::contains($lastToken[1], "\n")) {
-            $prettyPrintContent = trim($prettyPrintContent) . PHP_EOL;
+        if (! $lastToken) {
+            return $prettyPrintContent;
         }
-
-        return $prettyPrintContent;
+        if (! isset($lastToken[1])) {
+            return $prettyPrintContent;
+        }
+        if (! Strings::contains($lastToken[1], "\n")) {
+            return $prettyPrintContent;
+        }
+        $prettyPrintContent = trim($prettyPrintContent) . PHP_EOL;
     }
 }

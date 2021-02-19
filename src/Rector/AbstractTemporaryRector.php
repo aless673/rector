@@ -330,13 +330,14 @@ abstract class AbstractTemporaryRector extends NodeVisitorAbstract implements Ph
             $this->keepFileInfoAttribute($node, $originalNode);
             $this->rectorChangeCollector->notifyNodeFileInfo($node);
         }
-
         // if stmt ("$value;") was replaced by expr ("$value"), add the ending ";" (Expression) to prevent breaking the code
-        if ($originalNode instanceof Stmt && $node instanceof Expr) {
-            return new Expression($node);
+        if (! $originalNode instanceof Stmt) {
+            return $node;
         }
-
-        return $node;
+        if (! $node instanceof Expr) {
+            return $node;
+        }
+        return new Expression($node);
     }
 
     protected function isName(Node $node, string $name): bool
